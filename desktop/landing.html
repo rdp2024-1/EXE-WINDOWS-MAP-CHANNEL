@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keliling Dunia</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#1b1240;font-family:'Segoe UI',system-ui,sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%}
+#c{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:24px}
+h1{margin:0 0 .5em;font-size:min(11.5vmin,110px);letter-spacing:.03em;text-shadow:0 2px 14px #000b}
+a{display:inline-block;padding:.55em 2.2em;border-radius:999px;color:#fff;font-weight:700;font-size:min(5vmin,36px);text-decoration:none;background:linear-gradient(90deg,#FCAF45,#E1306C,#833AB4);box-shadow:0 6px 24px #0008;transition:transform .15s}
+a:hover,a:focus{transform:scale(1.08);outline:3px solid #fff}
+</style></head><body>
+<canvas id="cv"></canvas>
+<div id="c"><h1>Keliling Dunia</h1><a id="go" href="https://www.mapchannels.com/routemaps3/map.htm">Mulai</a></div>
+<script>
+const cv=document.getElementById('cv'),x=cv.getContext('2d');
+function fit(){const d=window.devicePixelRatio||1;cv.width=innerWidth*d;cv.height=innerHeight*d;x.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',fit);fit();
+document.getElementById('go').focus();
+function draw(ts){
+  const w=innerWidth,h=innerHeight,m=Math.min(w,h),hz=h*.62,t=(ts/60000)%1,TP=Math.PI*2;
+  let g=x.createLinearGradient(0,0,0,hz);
+  [['#141E5A',0],['#5B3A9E',.4],['#FF6F61',.78],['#FFC371',1]].forEach(([c,p])=>g.addColorStop(p,c));
+  x.fillStyle=g;x.fillRect(0,0,w,h);
+  for(let i=0;i<45;i++){
+    const a=((i*97)%101)/101*w,b=((i*53)%67)/67*hz*.55,tw=.5+.5*Math.sin(TP*(t*12+i*.13));
+    x.fillStyle='rgba(255,255,255,'+((60+150*tw)/255)+')';
+    x.beginPath();x.arc(a,b,m*.0025+(i%3)*m*.0012,0,TP);x.fill();
+  }
+  const sx=w*.68,sy=hz-m*.02,sr=m*.13;
+  g=x.createRadialGradient(sx,sy,0,sx,sy,sr*3);
+  g.addColorStop(0,'#FFF4C9');g.addColorStop(.35,'rgba(255,195,113,.53)');g.addColorStop(1,'rgba(255,111,97,0)');
+  x.fillStyle=g;x.beginPath();x.arc(sx,sy,sr*3,0,TP);x.fill();
+  x.fillStyle='#FFF6DA';x.beginPath();x.arc(sx,sy,sr,0,TP);x.fill();
+  for(let i=0;i<5;i++){
+    const k=1+i%2,p=(i*.21+t*k)%1,cx=-.2*w+p*1.4*w,cy=h*(.10+.07*i),r=m*(.09+.02*(i%3));
+    x.fillStyle=i%2?'rgba(255,214,224,.27)':'rgba(255,255,255,.33)';
+    [[0,0,1,.28],[-.15,-.2,.45,.3],[.3,-.15,.4,.27]].forEach(([dx,dy,rx,ry])=>{
+      x.beginPath();x.ellipse(cx+dx*r,cy+dy*r,rx*r,ry*r,0,0,TP);x.fill();
+    });
+  }
+  const ridge=(base,amp,f1,p1,f2,p2,c)=>{
+    x.fillStyle=c;x.beginPath();x.moveTo(0,h);
+    const st=w/60;
+    for(let q=0;q<=w+st;q+=st){
+      const u=q/w,n=.65*(1-Math.abs(Math.sin(Math.PI*(u*f1+p1))))+.35*(1-Math.abs(Math.sin(Math.PI*(u*f2+p2))));
+      x.lineTo(q,base-amp*n);
+    }
+    x.lineTo(w+st,h);x.closePath();x.fill();
+  };
+  ridge(hz,m*.26,1.5,.2,3.3,.7,'#5B4B9A');
+  ridge(hz+m*.03,m*.20,2.2,.6,4.7,.1,'#3B3577');
+  ridge(hz+m*.08,m*.14,3,.35,6.5,.9,'#1F2250');
+  const sh=hz+m*.10;
+  g=x.createLinearGradient(0,sh,0,h);g.addColorStop(0,'#2F7DA6');g.addColorStop(1,'#0B2545');
+  x.fillStyle=g;x.fillRect(0,sh,w,h-sh);
+  for(let i=0;i<9;i++){
+    const yy=sh+(h-sh)*i/9,ww=sr*(1.6-i*.12)*(.85+.15*Math.sin(TP*(t*20+i*.2)));
+    x.fillStyle='rgba(255,208,138,.33)';x.fillRect(sx-ww,yy,ww*2,(h-sh)*.045);
+  }
+  const pr=(t*3)%1,px=-.12*w+pr*1.24*w,py=h*.2-Math.sin(Math.PI*pr)*h*.05,s=m*.035;
+  g=x.createLinearGradient(px-s*14,0,px,0);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(255,255,255,.6)');
+  x.strokeStyle=g;x.lineWidth=m*.004;x.beginPath();x.moveTo(px-s*14,py+s*.15);x.lineTo(px-s,py+s*.15);x.stroke();
+  x.save();x.translate(px,py);x.rotate(-6*Math.PI/180);x.fillStyle='rgba(255,255,255,.95)';
+  x.beginPath();x.ellipse(0,0,s,s*.2,0,0,TP);x.fill();
+  x.beginPath();x.moveTo(-s*.15,0);x.lineTo(-s*.6,s*.8);x.lineTo(-s*.3,s*.8);x.lineTo(s*.3,0);x.fill();
+  x.beginPath();x.moveTo(-s*.8,-s*.1);x.lineTo(-s*1.1,-s*.6);x.lineTo(-s*.7,-s*.6);x.lineTo(-s*.4,-s*.1);x.fill();
+  x.restore();
+  g=x.createLinearGradient(0,0,0,h);
+  g.addColorStop(0,'rgba(0,0,0,.33)');g.addColorStop(.3,'rgba(0,0,0,.2)');g.addColorStop(.55,'rgba(0,0,0,.27)');g.addColorStop(1,'rgba(0,0,0,.53)');
+  x.fillStyle=g;x.fillRect(0,0,w,h);
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script></body></html>

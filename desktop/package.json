@@ -1,0 +1,23 @@
+{
+  "name": "keliling-dunia",
+  "version": "1.0.0",
+  "description": "Keliling Dunia",
+  "main": "main.js",
+  "author": "Keliling Dunia",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "com.kelilingdunia.app",
+    "productName": "Keliling Dunia",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "landing.html", "icon.png"],
+    "win": { "icon": "icon.png", "target": ["portable"] },
+    "portable": { "artifactName": "KelilingDunia.exe" }
+  }
+}
