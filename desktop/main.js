@@ -30,6 +30,15 @@ const HIDE_ADS_JS = `
   new MutationObserver(sweep).observe(document.documentElement, { childList: true, subtree: true });
 })();`;
 
+// Kunci judul jendela supaya tidak berubah mengikuti judul halaman MapChannels.
+const LOCK_TITLE_JS = `
+(function () {
+  var T = 'Keliling Dunia';
+  function f() { if (document.title !== T) document.title = T; }
+  f();
+  new MutationObserver(f).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+})();`;
+
 // Halaman perantara (iklan + link "View Map"): sembunyikan, lalu langsung buka petanya.
 const SKIP_INTRO_JS = `
 (function () {
@@ -64,19 +73,23 @@ function createWindow() {
     autoHideMenuBar: true
   });
   win.maximize();
-  win.on('page-title-updated', (e) => e.preventDefault());
+  win.on('page-title-updated', (e) => e.preventDefault()); // judul jendela tetap "Keliling Dunia"
+
   session.defaultSession.webRequest.onBeforeRequest((details, cb) => cb({ cancel: isAd(details.url) }));
 
   const wc = win.webContents;
   wc.on('dom-ready', () => {
     if (!/mapchannels\.com/.test(wc.getURL())) return;
     wc.executeJavaScript(HIDE_ADS_JS).catch(() => {});
+    wc.executeJavaScript(LOCK_TITLE_JS).catch(() => {});
     skipIntro(wc, 0);
   });
   wc.setWindowOpenHandler(({ url }) => { wc.loadURL(url); return { action: 'deny' }; });
   wc.on('before-input-event', (e, input) => {
     if (input.type === 'keyDown' && input.key === 'F11') win.setFullScreen(!win.isFullScreen());
   });
+
+  wc.on('did-finish-load', () => win.setTitle('Keliling Dunia'));
 
   win.loadFile(path.join(__dirname, 'landing.html'));
 }
