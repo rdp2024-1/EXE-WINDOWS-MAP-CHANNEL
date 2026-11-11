@@ -64,7 +64,7 @@ function createWindow() {
     autoHideMenuBar: true
   });
   win.maximize();
-
+  win.on('page-title-updated', (e) => e.preventDefault());
   session.defaultSession.webRequest.onBeforeRequest((details, cb) => cb({ cancel: isAd(details.url) }));
 
   const wc = win.webContents;
